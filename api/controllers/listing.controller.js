@@ -1,5 +1,6 @@
 import Listing from "../models/listing.model.js";
 import { errorHandler } from "../utils/error.js";
+import User from "../models/user.model.js";
 
 export const createListing = async (req, res, next) => {
   try {
@@ -70,12 +71,10 @@ export const getListings = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 9;
     const startIndex = parseInt(req.query.startIndex) || 0;
 
-    
     let query = {};
 
-   
     if (req.query.offer !== undefined) {
-      query.offer = req.query.offer === "true"; 
+      query.offer = req.query.offer === "true";
     }
 
     if (req.query.furnished !== undefined) {
@@ -119,3 +118,26 @@ export const getListings = async (req, res, next) => {
   }
 };
 
+export const addToWishList = async (req, res, next) => {
+  console.log(req.params.id);
+  try {
+    if (req.params.id) {
+      const listing = await Listing.findById(req.params.id);
+      if (listing) {
+        const user = await User.findById(req.user.id);
+
+        if (!Array.isArray(user.wishlist)) {
+          user.wishlist = [];
+        }
+
+        if (!user.wishlist.includes(listing._id)) {
+          await user.updateOne({ $push: { wishlist: listing._id } });
+          console.log(user);
+          res.status(200).json("Property wishlisted");
+        }
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};

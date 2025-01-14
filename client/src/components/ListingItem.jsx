@@ -4,13 +4,22 @@ import { IoIosBed } from "react-icons/io";
 import { FaBath } from "react-icons/fa";
 import { FiBookmark } from "react-icons/fi";
 import { FaRegMessage } from "react-icons/fa6";
+import axios from "axios";
 
 export default function ListingItem({ listing }) {
+  const addToWishList = async () => {
+    const res = await axios.post(`/api/listing/wish-list/post/${listing._id}`);
+    console.log(res)
+  };
+
   return (
     <div className="bg-white shadow-md relative border hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]">
       <div className="absolute right-3 top-3 space-x-3 text-slate-100 z-[1]  cursor-pointer flex items-center">
         <FaRegMessage className="text-[28px]" />
-        <FiBookmark className="text-[37px]" />
+        <FiBookmark
+          className="text-[35px]"
+          onClick={() => addToWishList(listing._id)}
+        />
       </div>
 
       <Link to={`/listing/${listing._id}`}>
