@@ -50,6 +50,11 @@ const listingSchema = new mongoose.Schema(
       type: Boolean,
       required: false,
     },
+    wishlisted_people: {
+      type: Array,
+      required: true,
+      default: [],
+    },
     userRef: {
       type: String,
       required: true,

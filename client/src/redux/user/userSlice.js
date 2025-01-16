@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentUser: null,
@@ -7,7 +7,7 @@ const initialState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
     signInStart: (state) => {
@@ -58,6 +58,14 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+    updateWishList: (state, action) => {
+      if (!state.currentUser.wishlist.includes(action.payload)) {
+        state.currentUser.wishlist.push(action.payload);
+        console.log(action.payload);
+      } else {
+        state.currentUser.wishlist.pull(action.payload);
+      }
+    },
   },
 });
 
@@ -74,6 +82,7 @@ export const {
   signOutUserFailure,
   signOutUserSuccess,
   signOutUserStart,
+  updateWishList,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -119,25 +119,37 @@ export const getListings = async (req, res, next) => {
 };
 
 export const addToWishList = async (req, res, next) => {
-  console.log(req.params.id);
   try {
     if (req.params.id) {
       const listing = await Listing.findById(req.params.id);
       if (listing) {
         const user = await User.findById(req.user.id);
 
-        if (!Array.isArray(user.wishlist)) {
-          user.wishlist = [];
+        if (!user) {
+          return res.status(401).json("Something went wrong!!");
         }
-
+        console.log(user.wishlist.includes(listing._id));
         if (!user.wishlist.includes(listing._id)) {
           await user.updateOne({ $push: { wishlist: listing._id } });
-          console.log(user);
-          res.status(200).json("Property wishlisted");
+          await listing.updateOne({
+            $push: { wishlisted_people: user._id },
+          });
+          return res.status(201).json("Property added to wishlist!");
+        } else {
+          await user.updateOne({ $pull: { wishlist: listing._id } });
+          return res.status(200).json("Property removed from wishlist");
         }
       }
     }
   } catch (error) {
-    next(error);
+    console.log(error);
+  }
+};
+
+export const checkWishList = async (req, res, next) => {
+  try {
+    console.log(req.params.id);
+  } catch (error) {
+    console.log(error);
   }
 };

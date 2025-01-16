@@ -2,24 +2,55 @@ import { Link } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
 import { IoIosBed } from "react-icons/io";
 import { FaBath } from "react-icons/fa";
-import { FiBookmark } from "react-icons/fi";
+import { FaRegBookmark } from "react-icons/fa";
+
 import { FaRegMessage } from "react-icons/fa6";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { FaBookmark } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+import { updateWishList } from "../redux/user/userSlice";
 
 export default function ListingItem({ listing }) {
+  const [inWishList, setInWishList] = useState(false);
+  // const { currentUser, loading, error } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
   const addToWishList = async () => {
+    setInWishList(!inWishList);
     const res = await axios.post(`/api/listing/wish-list/post/${listing._id}`);
-    console.log(res)
+    if (res.status === 201) {
+      dispatch(updateWishList(listing._id));
+      setInWishList(true);
+    } else {
+      dispatch(updateWishList(listing._id));
+      setInWishList(false);
+    }
   };
+
+  // const checkWishList = (id) => {};
+
+  // useEffect(() => {
+  //   checkWishList(listing._id);
+  // }, []);
 
   return (
     <div className="bg-white shadow-md relative border hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]">
       <div className="absolute right-3 top-3 space-x-3 text-slate-100 z-[1]  cursor-pointer flex items-center">
         <FaRegMessage className="text-[28px]" />
-        <FiBookmark
-          className="text-[35px]"
-          onClick={() => addToWishList(listing._id)}
-        />
+        {inWishList ? (
+          <FaBookmark
+            className="text-[29px] text-yellow-200/80"
+            onClick={() => addToWishList(listing._id)}
+          />
+        ) : (
+          <FaRegBookmark
+            className="text-[29px] text-slate-100"
+            onClick={() => addToWishList(listing._id)}
+          />
+        )}
       </div>
 
       <Link to={`/listing/${listing._id}`}>
@@ -72,6 +103,7 @@ export default function ListingItem({ listing }) {
           </div>
         </div>
       </Link>
+      <ToastContainer />
     </div>
   );
 }
