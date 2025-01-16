@@ -11,27 +11,30 @@ import { useEffect, useState } from "react";
 import { FaBookmark } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
+import { updateWishList } from "../redux/user/userSlice";
 
 export default function ListingItem({ listing }) {
   const [inWishList, setInWishList] = useState(false);
-  // const { currentUser, loading, error } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const addToWishList = async () => {
+  const addToWishList = async (id) => {
     setInWishList(!inWishList);
-    const res = await axios.post(`/api/listing/wish-list/post/${listing._id}`);
+    const res = await axios.post(`/api/listing/wish-list/post/${id}`);
     if (res.status === 201) {
       setInWishList(true);
+      dispatch(updateWishList(id));
     } else {
       setInWishList(false);
+      dispatch(updateWishList(id));
     }
   };
 
-  // const checkWishList = (id) => {};
-
-  // useEffect(() => {
-  //   checkWishList(listing._id);
-  // }, []);
+  useEffect(() => {
+    currentUser.wishlist.includes(listing._id)
+      ? setInWishList(true)
+      : setInWishList(false);
+  }, []);
 
   return (
     <div className="bg-white shadow-md relative border hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]">
@@ -40,7 +43,9 @@ export default function ListingItem({ listing }) {
         {inWishList ? (
           <FaBookmark
             className="text-[29px] text-yellow-200/80"
-            onClick={() => addToWishList(listing._id)}
+            onClick={() => {
+              addToWishList(listing._id);
+            }}
           />
         ) : (
           <FaRegBookmark

@@ -61,9 +61,10 @@ const userSlice = createSlice({
     updateWishList: (state, action) => {
       if (!state.currentUser.wishlist.includes(action.payload)) {
         state.currentUser.wishlist.push(action.payload);
-        console.log(action.payload);
       } else {
-        state.currentUser.wishlist.pull(action.payload);
+        state.currentUser.wishlist = state.currentUser.wishlist.filter(
+          (item) => item != action.payload
+        );
       }
     },
   },
