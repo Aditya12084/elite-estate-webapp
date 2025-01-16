@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import { FaBookmark } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
-import { updateWishList } from "../redux/user/userSlice";
 
 export default function ListingItem({ listing }) {
   const [inWishList, setInWishList] = useState(false);
@@ -22,10 +21,8 @@ export default function ListingItem({ listing }) {
     setInWishList(!inWishList);
     const res = await axios.post(`/api/listing/wish-list/post/${listing._id}`);
     if (res.status === 201) {
-      dispatch(updateWishList(listing._id));
       setInWishList(true);
     } else {
-      dispatch(updateWishList(listing._id));
       setInWishList(false);
     }
   };
