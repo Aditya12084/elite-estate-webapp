@@ -24,7 +24,6 @@ export const signup = async (req, res, next) => {
       });
     }
 
-    // Hash the password
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
     // Create a new user

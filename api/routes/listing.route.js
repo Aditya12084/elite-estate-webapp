@@ -6,7 +6,7 @@ import {
   getListing,
   getListings,
   addToWishList,
-  checkWishList,
+  fetchWishList,
 } from "../controllers/listing.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
@@ -18,6 +18,6 @@ router.post("/update/:id", verifyToken, updateListing);
 router.get("/get/:id", getListing);
 router.get("/get", getListings);
 router.post("/wish-list/post/:id", verifyToken, addToWishList);
-router.post("/check-wish-list/post/:id", verifyToken, checkWishList);
+router.get("/wish-list", verifyToken, fetchWishList);
 
 export default router;

@@ -28,7 +28,7 @@ export default function App() {
         <Route path="/contactus" element={<Contactus />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/*" element={<Profile />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route
             path="/update-listing/:listingId"

@@ -19,19 +19,21 @@ export default function ListingItem({ listing }) {
   const dispatch = useDispatch();
 
   const addToWishList = async (id) => {
-    setInWishList(!inWishList);
-    const res = await axios.post(`/api/listing/wish-list/post/${id}`);
-    if (res.status === 201) {
-      setInWishList(true);
-      dispatch(updateWishList(id));
-    } else {
-      setInWishList(false);
-      dispatch(updateWishList(id));
+    if (currentUser != null) {
+      setInWishList(!inWishList);
+      const res = await axios.post(`/api/listing/wish-list/post/${id}`);
+      if (res.status === 201) {
+        setInWishList(true);
+        dispatch(updateWishList(id));
+      } else {
+        setInWishList(false);
+        dispatch(updateWishList(id));
+      }
     }
   };
 
   useEffect(() => {
-    currentUser.wishlist.includes(listing._id)
+    currentUser != null && currentUser.wishlist.includes(listing._id)
       ? setInWishList(true)
       : setInWishList(false);
   }, []);

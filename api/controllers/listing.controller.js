@@ -1,7 +1,7 @@
 import Listing from "../models/listing.model.js";
 import { errorHandler } from "../utils/error.js";
 import User from "../models/user.model.js";
-
+import { MongoClient, ObjectId } from "mongodb";
 export const createListing = async (req, res, next) => {
   try {
     console.log(req.body);
@@ -129,7 +129,10 @@ export const addToWishList = async (req, res, next) => {
           return res.status(401).json("Something went wrong!!");
         }
         console.log(user.wishlist.includes(listing._id));
-        if (!user.wishlist.includes(listing._id)) {
+        if (
+          !user.wishlist.includes(listing._id) &&
+          !listing.wishlisted_people.includes(user._id)
+        ) {
           await user.updateOne({ $push: { wishlist: listing._id } });
           await listing.updateOne({
             $push: { wishlisted_people: user._id },
@@ -137,6 +140,7 @@ export const addToWishList = async (req, res, next) => {
           return res.status(201).json("Property added to wishlist!");
         } else {
           await user.updateOne({ $pull: { wishlist: listing._id } });
+          await listing.updateOne({ $pull: { wishlisted_people: user._id } });
           return res.status(200).json("Property removed from wishlist");
         }
       }
@@ -146,9 +150,43 @@ export const addToWishList = async (req, res, next) => {
   }
 };
 
-export const checkWishList = async (req, res, next) => {
+export const fetchWishList = async (req, res, next) => {
   try {
-    console.log(req.params.id);
+    // Get the customer ID from the request
+    const customerId = req.user.id;
+
+    // Find the user by their ID
+    const user = await User.findOne({ _id: customerId });
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Get the wishlist IDs from the user
+    const wishlistIds = user.wishlist.map((id) => id);
+
+    // Find the listings that match the wishlist IDs
+    const listings = await Listing.find({ _id: { $in: wishlistIds } });
+
+    if (!listings || listings.length === 0) {
+      console.log("No listings found in the wishlist");
+      return res
+        .status(404)
+        .json({ message: "No listings found in the wishlist" });
+    }
+
+    // Remove the 'wishlisted_people' field from each listing
+    const cleanedListings = listings.map((listing) => {
+      const { wishlisted_people, userRef, ...rest } = listing.toObject(); // Convert Mongoose document to plain object
+      return rest;
+    });
+
+    // Log the cleaned listings
+    console.log("Wishlist Listings:", cleanedListings);
+
+    // Return the cleaned listings as the response
+    return res.status(200).json(cleanedListings);
   } catch (error) {
     console.log(error);
   }
